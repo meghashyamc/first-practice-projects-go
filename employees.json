@@ -1,0 +1,40 @@
+
+
+[
+
+{"EmpID": 1,
+"Name": "Pappu",
+"Department": ["Accounts", "Management"],
+"Addresses": [ {"DoorNo.": 25,
+				"Street": "Adepalli Street",
+				"Locality": "Basvangudi",
+				"PIN": 560002},
+				 {"Door No.": 4,
+				"Street": "Ramu Street",
+				"Locality": "KR Puram",
+				"PIN": 560042}],
+"There": true},
+
+{"EmpID": 2,
+"Name": "Tappesh",
+"Department": ["IT", "Admin"],
+"Addresses": [ {"DoorNo.": 34,
+				"Street": "Main Street",
+				"Locality": "Varthur",
+				"PIN": 560086}],
+				
+"There": true},
+
+{"EmpID": 3,
+"Name": "Pikita",
+"Department": ["IT"],
+"Addresses": [ {"DoorNo.": 654,
+				"Street": "Mahatma Gandhi Street",
+				"Locality": "Lalbagh",
+				"PIN": 560003},
+				 {"Door No.": 765,
+				"Street": "Jawahar Street",
+				"Locality": "Yelahanka",
+				"PIN": 560342}],
+"There": true}]
+
