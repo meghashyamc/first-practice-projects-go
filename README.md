@@ -4,7 +4,7 @@ Practice project in Golang to read and process employee data from JSON file
 * Run the file (go run main.go).
 * Employee data is read from the json file.
 
-* The following commands are supported.
+The following commands are supported.
 
 
 <b>LIST</b>
