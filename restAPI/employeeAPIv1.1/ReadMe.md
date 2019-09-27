@@ -1,17 +1,17 @@
 
-This is a rest API to upload/view/delete employee details.
+<b>This is a rest API to upload/view/delete employee details.</b>
 
-/add : add employee list in JSON format
-/list/all : Lists all employees
-/list/dept/{name}: Lists all employees with given department name
-/list/loc/{pin}: Lists employees living at that pin code
-/list/loc/{pin}/dn/{doorno}: Lists employees living at that door no.
-/list/loc/{pin}/street/{streetname}: Lists employees living at that street
-/list/loc/{pin}/locality/{locality}: Lists employees living at that locality
+<b>/add </b>: add employee list in JSON format
+<b>/list/all </b>: Lists all employees
+<b>/list/dept/{name}</b>: Lists all employees with given department name
+<b>/list/loc/{pin}</b>: Lists employees living at that pin code
+<b>/list/loc/{pin}/dn/{doorno}</b>: Lists employees living at that door no.
+<b>/list/loc/{pin}/street/{streetname}</b>: Lists employees living at that street
+<b>/list/loc/{pin}/locality/{locality}</b>: Lists employees living at that locality
 
-/show/{id}: shows employee with that id
+<b>/show/{id}</b>: shows employee with that id
 
-/delete/all: deletes all employees
-/delete/{id}: deletes employee with given id
+<b>/delete/all</b>: deletes all employees
+<b>/delete/{id}</b>: deletes employee with given id
 
-/remove/{id}: removes employee with given id
+<b>/remove/{id}</b>: removes employee with given id
