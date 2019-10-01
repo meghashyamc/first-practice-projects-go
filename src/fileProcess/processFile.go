@@ -74,17 +74,17 @@ func areCompulsoryFieldsThere(moreEmployees *([]store.Employee)) error {
 	for _, empl := range *moreEmployees {
 		if empl.Name == "" {
 
-			return errors.New("Name of employee not specified. Please add it.")
+			return errors.New("Could not add: Name of employee not specified. Please add it.")
 		}
 
 		if len(empl.Addresses) == 0 {
 
-			return errors.New("Zero addresses were specified for " + empl.Name + ". Atleast one address must be specified.")
+			return errors.New("Could not add: Zero addresses were specified for " + empl.Name + ". Atleast one address must be specified.")
 		}
 
 		if len(empl.GetDept()) == 0 {
 
-			return errors.New("Zero departments were specified for " + empl.Name + ". Atleast one department must be specified.")
+			return errors.New("Could not add: Zero departments were specified for " + empl.Name + ". Atleast one department must be specified.")
 		}
 	}
 

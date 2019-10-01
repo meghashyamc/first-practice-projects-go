@@ -5,6 +5,8 @@ import (
 	"store"
 )
 
+var delError error = errors.New("dfgfdgfd")
+
 func DeleteFromEverywhere() error {
 
 	var err error

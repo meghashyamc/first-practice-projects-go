@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"delete"
+	"encoding/json"
 	"fileProcess"
 	"kiplog"
 	"list"
@@ -20,20 +21,14 @@ func ReceiveAndProcessFile(w http.ResponseWriter, req *http.Request) {
 	_, err := fileProcess.ParseFileAndStoreListOfEmployees(req.Body, &moreEmployees)
 
 	if err != nil {
-
-		w.Write([]byte(err.Error()))
+		http.Error(w, err.Error(), 400)
 		kiplog.HTTPLog(err.Error())
 	} else {
 		store.StoreEmployeesByIdDeptAndLoc(&moreEmployees)
+		w.Write([]byte("Success: The following employees were added:\n\n"))
+		bytes, _ := json.MarshalIndent(&moreEmployees, "", "    ")
 
-		w.Write([]byte("Successfully added these employees:"))
-
-		for _, empl := range moreEmployees {
-
-			w.Write([]byte("\n"))
-			w.Write([]byte(empl.Name))
-
-		}
+		w.Write(bytes)
 
 	}
 }
@@ -44,14 +39,11 @@ func ListSearch(w http.ResponseWriter, req *http.Request) {
 	term := params["term"]
 	employees, err := list.ListSearchEmployees(term, &(store.Employees))
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		http.Error(w, err.Error(), 400)
 		kiplog.HTTPLog(err.Error())
 		return
 	}
-	w.Write([]byte("List of employees matching search term "))
-	w.Write([]byte(term))
-	w.Write([]byte(":\n\n"))
-	writeEmployees(&w, &employees)
+	json.NewEncoder(w).Encode(&employees)
 
 }
 
@@ -61,14 +53,13 @@ func ListAll(w http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 
-		w.Write([]byte(err.Error()))
+		http.Error(w, err.Error(), 400)
 		kiplog.HTTPLog(err.Error())
 		return
 
 	}
-	w.Write([]byte("List of all employees:\n\n"))
 
-	writeEmployees(&w, &employees)
+	json.NewEncoder(w).Encode(&employees)
 
 }
 
@@ -80,16 +71,12 @@ func ListByDept(w http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 
-		w.Write([]byte(err.Error()))
+		http.Error(w, err.Error(), 400)
 		kiplog.HTTPLog(err.Error())
 		return
 	}
 
-	w.Write([]byte("List of all employees in the department "))
-	w.Write([]byte(dept))
-	w.Write([]byte(":\n\n"))
-
-	writeEmployees(&w, &employees)
+	json.NewEncoder(w).Encode(&employees)
 
 }
 
@@ -102,7 +89,7 @@ func ListByLoc(w http.ResponseWriter, req *http.Request) {
 	pin, err1 := strconv.Atoi(pinString)
 
 	if err1 != nil {
-		w.Write([]byte("The pin code must be a number"))
+		http.Error(w, "The pin code must be a number", 400)
 
 		kiplog.HTTPLog("The pin code must be a number")
 		return
@@ -111,15 +98,13 @@ func ListByLoc(w http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 
-		w.Write([]byte(err.Error()))
+		http.Error(w, err.Error(), 400)
 		kiplog.HTTPLog(err.Error())
 		return
 
 	}
-	w.Write([]byte("List of all employees at the PIN code "))
-	w.Write([]byte(pinString))
-	w.Write([]byte(":\n\n"))
-	writeEmployees(&w, &employees)
+
+	json.NewEncoder(w).Encode(&employees)
 
 }
 
@@ -133,7 +118,7 @@ func ListByLocDoorNo(w http.ResponseWriter, req *http.Request) {
 	pin, err1 := strconv.Atoi(pinString)
 
 	if err1 != nil {
-		w.Write([]byte("The pin code must be a number."))
+		http.Error(w, "The pin code must be a number.", 400)
 		kiplog.HTTPLog("The pin code must be a number.")
 		return
 	}
@@ -141,7 +126,7 @@ func ListByLocDoorNo(w http.ResponseWriter, req *http.Request) {
 	dn, err2 := strconv.Atoi(dnString)
 
 	if err2 != nil {
-		w.Write([]byte("The door number must be a number."))
+		http.Error(w, "The door number must be a number.", 400)
 		kiplog.HTTPLog("The door number must be a number.")
 		return
 	}
@@ -149,7 +134,8 @@ func ListByLocDoorNo(w http.ResponseWriter, req *http.Request) {
 	employeesAtLoc, errLoc := list.ListEmployeesByLoc(pin, &(store.LocEmpMap))
 	if errLoc != nil {
 
-		w.Write([]byte(errLoc.Error()))
+		http.Error(w, errLoc.Error(), 400)
+
 		kiplog.HTTPLog(errLoc.Error())
 		return
 
@@ -159,19 +145,15 @@ func ListByLocDoorNo(w http.ResponseWriter, req *http.Request) {
 
 	if errDoor != nil {
 
-		w.Write([]byte(errDoor.Error()))
+		http.Error(w, errDoor.Error(), 400)
 		kiplog.HTTPLog(errDoor.Error())
 
 		return
 
 	}
 
-	w.Write([]byte("List of all employees at the PIN code "))
-	w.Write([]byte(pinString))
-	w.Write([]byte(", and door number "))
-	w.Write([]byte(dnString))
-	w.Write([]byte(":\n\n"))
-	writeEmployees(&w, &employeesAtDoorNo)
+	json.NewEncoder(w).Encode(&employeesAtDoorNo)
+
 }
 
 func ListByLocStreet(w http.ResponseWriter, req *http.Request) {
@@ -183,7 +165,7 @@ func ListByLocStreet(w http.ResponseWriter, req *http.Request) {
 	pin, err := strconv.Atoi(pinString)
 
 	if err != nil {
-		w.Write([]byte("The pin code must be a number"))
+		http.Error(w, "The pin code must be a number", 400)
 		kiplog.HTTPLog("The pin code must be a number")
 		return
 	}
@@ -192,7 +174,7 @@ func ListByLocStreet(w http.ResponseWriter, req *http.Request) {
 
 	if errLoc != nil {
 
-		w.Write([]byte(errLoc.Error()))
+		http.Error(w, errLoc.Error(), 400)
 		kiplog.HTTPLog(errLoc.Error())
 		return
 
@@ -202,17 +184,12 @@ func ListByLocStreet(w http.ResponseWriter, req *http.Request) {
 
 	if errStreet != nil {
 
-		w.Write([]byte(errStreet.Error()))
+		http.Error(w, errStreet.Error(), 400)
 		kiplog.HTTPLog(errStreet.Error())
 		return
 
 	}
-	w.Write([]byte("List of all employees at the PIN code "))
-	w.Write([]byte(pinString))
-	w.Write([]byte(", and door number "))
-	w.Write([]byte(params["street"]))
-	w.Write([]byte(":\n\n"))
-	writeEmployees(&w, &employeesAtStreet)
+	json.NewEncoder(w).Encode(&employeesAtStreet)
 
 }
 
@@ -225,7 +202,7 @@ func ListByLocLocality(w http.ResponseWriter, req *http.Request) {
 	pin, err := strconv.Atoi(pinString)
 
 	if err != nil {
-		w.Write([]byte("The pin code must be a number"))
+		http.Error(w, "The pin code must be a number", 400)
 		kiplog.HTTPLog("The pin code must be a number")
 		return
 
@@ -235,7 +212,7 @@ func ListByLocLocality(w http.ResponseWriter, req *http.Request) {
 
 	if errLoc != nil {
 
-		w.Write([]byte(errLoc.Error()))
+		http.Error(w, errLoc.Error(), 400)
 		kiplog.HTTPLog(errLoc.Error())
 		return
 
@@ -243,17 +220,12 @@ func ListByLocLocality(w http.ResponseWriter, req *http.Request) {
 	employeesAtLocality, errLocality := list.ListEmployeesByLocalityAtLoc(params["locality"], &employeesAtLoc)
 	if errLocality != nil {
 
-		w.Write([]byte(errLocality.Error()))
+		http.Error(w, errLocality.Error(), 400)
 		kiplog.HTTPLog(errLocality.Error())
 		return
 
 	}
-	w.Write([]byte("List of all employees at the PIN code "))
-	w.Write([]byte(pinString))
-	w.Write([]byte(", and locality "))
-	w.Write([]byte(params["locality"]))
-	w.Write([]byte(":\n\n"))
-	writeEmployees(&w, &employeesAtLocality)
+	json.NewEncoder(w).Encode(&employeesAtLocality)
 
 }
 
@@ -266,7 +238,7 @@ func ShowByID(w http.ResponseWriter, req *http.Request) {
 	id, err := strconv.Atoi(stringID)
 
 	if err != nil {
-		w.Write([]byte("The id must be a number"))
+		http.Error(w, "The id must be a number", 400)
 		kiplog.HTTPLog("The id must be a number")
 		return
 	}
@@ -276,19 +248,15 @@ func ShowByID(w http.ResponseWriter, req *http.Request) {
 
 	if errShow != nil {
 
-		w.Write([]byte(errShow.Error()))
+		http.Error(w, errShow.Error(), 400)
 		kiplog.HTTPLog(errShow.Error())
 		return
 
 	}
 
 	employees = append(employees, empl)
+	json.NewEncoder(w).Encode(&employees)
 
-	w.Write([]byte("The employee with the ID "))
-	w.Write([]byte(stringID))
-	w.Write([]byte(" is: \n\n "))
-
-	writeEmployees(&w, &employees)
 }
 
 func DeleteAll(w http.ResponseWriter, req *http.Request) {
@@ -298,7 +266,7 @@ func DeleteAll(w http.ResponseWriter, req *http.Request) {
 	err := delete.DeleteFromEverywhere()
 
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		http.Error(w, err.Error(), 400)
 		kiplog.HTTPLog(err.Error())
 		return
 
@@ -318,7 +286,7 @@ func DeleteByID(w http.ResponseWriter, req *http.Request) {
 	id, err1 := strconv.Atoi(stringID)
 
 	if err1 != nil {
-		w.Write([]byte("The id must be a number"))
+		http.Error(w, "The id must be a number", 400)
 		kiplog.HTTPLog("The id must be a number")
 	}
 	err := delete.DeleteByIDFromEverywhere(id)
@@ -326,7 +294,7 @@ func DeleteByID(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 
 		kiplog.HTTPLog(err.Error())
-		w.Write([]byte(err.Error()))
+		http.Error(w, err.Error(), 400)
 		return
 	}
 
@@ -345,7 +313,7 @@ func RemoveByID(w http.ResponseWriter, req *http.Request) {
 	id, err1 := strconv.Atoi(stringID)
 
 	if err1 != nil {
-		w.Write([]byte("The id must be a number"))
+		http.Error(w, "The id must be a number", 400)
 		kiplog.HTTPLog("The id must be a number")
 	}
 
@@ -354,48 +322,11 @@ func RemoveByID(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 
 		kiplog.HTTPLog(err.Error())
-		w.Write([]byte(err.Error()))
+		http.Error(w, err.Error(), 400)
 		return
 	}
 
 	w.Write([]byte("Removed the employee with ID "))
 	w.Write([]byte(stringID))
 	w.Write([]byte(" successfully."))
-}
-
-func writeEmployees(w *http.ResponseWriter, employees *([]store.Employee)) {
-
-	for _, empl := range *employees {
-		(*w).Write([]byte("ID: "))
-		(*w).Write([]byte(strconv.Itoa(empl.GetID())))
-		(*w).Write([]byte("\n"))
-		(*w).Write([]byte("Name: "))
-		(*w).Write([]byte(empl.Name))
-		(*w).Write([]byte("\n"))
-		(*w).Write([]byte("Departments: "))
-
-		for _, dept := range empl.GetDept() {
-			(*w).Write([]byte(dept))
-			(*w).Write([]byte(" "))
-		}
-
-		(*w).Write([]byte("\n"))
-		(*w).Write([]byte("Addresses: "))
-		(*w).Write([]byte("\n"))
-
-		for _, addr := range empl.Addresses {
-
-			(*w).Write([]byte(strconv.Itoa(addr.GetDoorNo())))
-			(*w).Write([]byte(", "))
-			(*w).Write([]byte(addr.GetStreet()))
-			(*w).Write([]byte(", "))
-			(*w).Write([]byte(addr.GetLocality()))
-			(*w).Write([]byte(", "))
-			(*w).Write([]byte(strconv.Itoa(addr.PIN)))
-			(*w).Write([]byte("\n"))
-
-		}
-
-		(*w).Write([]byte("\n\n"))
-	}
 }
