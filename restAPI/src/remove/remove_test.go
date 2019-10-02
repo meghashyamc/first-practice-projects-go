@@ -10,116 +10,44 @@ var testEmployee1 store.Employee
 var testEmployee2 store.Employee
 var testEmployee3 store.Employee
 
-func TestRemoveEmployeesFromList(t *testing.T) {
-
+func TestRemoveEmployeesByIDEverywhere(t *testing.T) {
 	initializeStuff()
 
-	RemoveEmployeesFromList(1, &testEmployees)
+	err := RemoveEmployeesByIDEverywhere(2)
 
-	if testEmployees[0].There == true {
+	if err != nil {
 
-		t.Error("Expected Pappu's There field to be false got", testEmployees[0].There)
-	}
-
-}
-
-func BenchmarkRemoveEmployeesFromList(b *testing.B) {
-
-	initializeStuff()
-	b.ResetTimer()
-
-	for i := 0; i < 3; i++ {
-
-		RemoveEmployeesFromList(i+1, &testEmployees)
+		t.Error("Expected Rinky's There field to be false got error:", err)
 
 	}
-
-}
-
-func TestRemoveEmployeesFromIDEmpMap(t *testing.T) {
-
-	initializeStuff()
-
-	RemoveEmployeesFromIdEmpMap(2, &(store.IdEmpMap))
 
 	if store.IdEmpMap[2].There == true {
 
 		t.Error("Expected Rinky's There field to be false in IdEmpMap got", store.IdEmpMap[2].There)
 	}
+
+	if (*(store.DeptEmpMap["IT"]))[0].There == true {
+
+		t.Error("Expected Rinky's there field to be false, got", true)
+
+	}
+
+	if (*(store.LocEmpMap[560103]))[1].There == true {
+
+		t.Error("Expected Rinky's there field to be false, got", true)
+
+	}
+
 }
 
-func BenchmarkRemoveEmployeesFromIDEmpMap(b *testing.B) {
+func BenchmarkRemoveEmployeesByIDEverywhere(b *testing.B) {
 
 	initializeStuff()
 	b.ResetTimer()
 
 	for i := 0; i < 3; i++ {
 
-		RemoveEmployeesFromIdEmpMap(i+1, &(store.IdEmpMap))
-
-	}
-
-}
-
-func TestRemoveEmployeesFromDeptEmpMap(t *testing.T) {
-
-	initializeStuff()
-
-	RemoveEmployeesFromDeptEmpMap(1, &(store.DeptEmpMap))
-
-	if (*(store.DeptEmpMap["Accounts"]))[0].There == true {
-
-		t.Error("Expected Pappu's there field to be false, got", true)
-
-	}
-
-	if (*(store.DeptEmpMap["Management"]))[0].There == true {
-
-		t.Error("Expected Pappu's there field to be false, got", true)
-
-	}
-}
-
-func BenchmarkRemoveEmployeesFromDeptEmpMap(b *testing.B) {
-
-	initializeStuff()
-	b.ResetTimer()
-
-	for i := 0; i < 3; i++ {
-
-		RemoveEmployeesFromDeptEmpMap(i+1, &(store.DeptEmpMap))
-
-	}
-
-}
-
-func TestRemoveEmployeesFromLocEmpMap(t *testing.T) {
-
-	initializeStuff()
-
-	RemoveEmployeesFromLocEmpMap(1, &(store.LocEmpMap))
-
-	if (*(store.LocEmpMap[560002]))[0].There == true {
-
-		t.Error("Expected Pappu's there field to be false, got", true)
-
-	}
-
-	if (*(store.LocEmpMap[560103]))[0].There == true {
-
-		t.Error("Expected Pappu's there field to be false, got", true)
-
-	}
-}
-
-func BenchmarkRemoveEmployeesFromLocEmpMap(b *testing.B) {
-
-	initializeStuff()
-	b.ResetTimer()
-
-	for i := 0; i < 3; i++ {
-
-		RemoveEmployeesFromLocEmpMap(i+1, &(store.LocEmpMap))
+		RemoveEmployeesByIDEverywhere(i + 1)
 
 	}
 
@@ -172,5 +100,7 @@ func initializeStuff() {
 	testEmployees = []store.Employee{
 		testEmployee1, testEmployee2, testEmployee3}
 	store.InitializeEmployeesAndMaps()
+	store.Employees = append(store.Employees, testEmployees...)
+
 	store.StoreEmployeesByIdDeptAndLoc(&testEmployees)
 }

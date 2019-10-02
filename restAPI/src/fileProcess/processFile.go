@@ -5,10 +5,14 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
+	"kiplog"
 	"math/rand"
 	"store"
+	"sync"
+	"time"
 )
+
+var wg sync.WaitGroup
 
 func ParseFileAndStoreListOfEmployees(reqBody io.Reader, moreEmployees *([]store.Employee)) (bool, error) {
 
@@ -16,7 +20,7 @@ func ParseFileAndStoreListOfEmployees(reqBody io.Reader, moreEmployees *([]store
 	body, err := ioutil.ReadAll(reqBody)
 
 	if err != nil {
-		log.Println(err)
+		kiplog.HTTPLog(err.Error())
 		return false, err
 
 	}
@@ -26,24 +30,40 @@ func ParseFileAndStoreListOfEmployees(reqBody io.Reader, moreEmployees *([]store
 
 	if err1 != nil {
 
-		log.Println("Could not read JSON file.")
+		kiplog.HTTPLog("Could not read JSON file.")
 		return false, errors.New("Could not read JSON file.")
 	}
 
-	if !areCompulsoryFieldsThere(moreEmployees) {
+	err2 := areCompulsoryFieldsThere(moreEmployees)
 
-		log.Println("Compulsory fields Name and Address were empty for some employees. Did not add any employee. Please complete the Name and Address fields and resubmit.")
-		return false, errors.New("Compulsory fields Name and Address were empty for some employees. Did not add any employee. Please complete the Name and Address fields and resubmit.")
+	if err2 != nil {
+		return false, err2
 	}
 
-	generateIDsIfNotThere(moreEmployees)
+	wg.Add(2)
+	go generateIDsIfNotThere(moreEmployees)
+	go addTimeStamps(moreEmployees)
+	wg.Wait()
 
 	store.Employees = append(store.Employees, *moreEmployees...)
 	return true, nil
 }
 
-func generateIDsIfNotThere(moreEmployees *([]store.Employee)) {
+func addTimeStamps(moreEmployees *([]store.Employee)) {
+	defer wg.Done()
+	for i := 0; i < len(*moreEmployees); i++ {
+		zeroTime := new(time.Time)
+		timestamp := (*moreEmployees)[i].Timestamp
+		if *zeroTime == timestamp {
 
+			(*moreEmployees)[i].Timestamp = time.Now()
+		}
+
+	}
+}
+
+func generateIDsIfNotThere(moreEmployees *([]store.Employee)) {
+	defer wg.Done()
 	for i := 0; i < len(*moreEmployees); i++ {
 
 		if (*moreEmployees)[i].GetID() == 0 {
@@ -55,26 +75,26 @@ func generateIDsIfNotThere(moreEmployees *([]store.Employee)) {
 
 }
 
-func areCompulsoryFieldsThere(moreEmployees *([]store.Employee)) bool {
+func areCompulsoryFieldsThere(moreEmployees *([]store.Employee)) error {
 
 	for _, empl := range *moreEmployees {
 		if empl.Name == "" {
 
-			return false
+			return errors.New("Could not add: Name of employee not specified. Please add it.")
 		}
 
 		if len(empl.Addresses) == 0 {
 
-			return false
+			return errors.New("Could not add: Zero addresses were specified for " + empl.Name + ". Atleast one address must be specified.")
 		}
 
 		if len(empl.GetDept()) == 0 {
 
-			return false
+			return errors.New("Could not add: Zero departments were specified for " + empl.Name + ". Atleast one department must be specified.")
 		}
 	}
 
-	return true
+	return nil
 }
 
 func generateID(max int, set *(map[int]bool)) int {

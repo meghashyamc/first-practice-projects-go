@@ -11,8 +11,12 @@ var employees []store.Employee
 func TestListAllEmployees(t *testing.T) {
 
 	initializeStuff()
-	list := ListAllEmployees(&employees)
+	list, err := ListAllEmployees(&employees)
 
+	if err != nil {
+		t.Error("Expected 2 employees to get added, got error:", err)
+
+	}
 	if len(list) != 2 {
 
 		t.Error("Expected 2 employees to get added, got", len(list))
@@ -39,8 +43,12 @@ func BenchmarkListAllEmployees(b *testing.B) {
 func TestListSearchEmployees(t *testing.T) {
 
 	term := "pap"
-	list := ListSearchEmployees(term, &employees)
+	list, err := ListSearchEmployees(term, &employees)
 
+	if err != nil {
+		t.Error("Expected 1 employee to match term 'pap', got error:", err)
+
+	}
 	if len(list) != 1 {
 
 		t.Error("Expected 1 employee to match term 'pap' got", len(list))
@@ -106,18 +114,30 @@ func TestListEmployeesByLoc(t *testing.T) {
 	locEmpMap[560003] = &list2
 	locEmpMap[560103] = &list3
 
-	listAddress := ListEmployeesByLoc(560002, &locEmpMap)
+	listAddress, err := ListEmployeesByLoc(560002, &locEmpMap)
+
+	if err != nil {
+
+		t.Error("Expected 560002 to have employee Pappu, got error:", err)
+	}
 	if listAddress[0].Name != list1[0].Name {
 
 		t.Error("Expected 560002 to have employee Pappu got the address(es) of", listAddress)
 
 	}
 
-	listAddress = ListEmployeesByLoc(560103, &locEmpMap)
+	listAddress, err = ListEmployeesByLoc(560103, &locEmpMap)
+
+	if err != nil {
+
+		t.Error("Expected 560103 to have  employees Pappu and Rinky, got error:", err)
+
+	}
+
 	if listAddress[0].Name != list3[0].Name &&
 		listAddress[1].Name != list3[1].Name {
 
-		t.Error("Expected 560002 to have employees Pappu and Rinku got the address(es) of", listAddress)
+		t.Error("Expected 560103 to have employees Pappu and Rinky got the address(es) of", listAddress)
 
 	}
 

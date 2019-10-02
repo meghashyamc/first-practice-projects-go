@@ -14,8 +14,13 @@ func TestShowEmployeeByID(t *testing.T) {
 
 	initializeStuff()
 
-	empl := ShowEmployeeByID(2, &(store.IdEmpMap))
+	empl, err := ShowEmployeeByID(2, &(store.IdEmpMap))
 
+	if err != nil {
+
+		t.Error("Expected ID 2 for employee Rinky working in Admin, got error:", err)
+
+	}
 	if empl.Name != "Rinky" || (empl.GetDept())[1] != "Admin" {
 
 		t.Error("Expected ID 2 for employee Rinky working in Admin, got", empl.Name, "working in ", (empl.GetDept())[1])

@@ -1,6 +1,9 @@
 package store
 
-import "log"
+import (
+	"sync"
+	"time"
+)
 
 var MaxID int
 var IDset map[int]bool
@@ -8,6 +11,7 @@ var Employees []Employee
 var IdEmpMap map[int]Employee
 var DeptEmpMap map[string]*([]Employee)
 var LocEmpMap map[int]*([]Employee)
+var wg sync.WaitGroup
 
 type Address struct {
 	Doorno   int
@@ -43,13 +47,10 @@ type Employee struct {
 	Department []string
 	Addresses  []Address
 	There      bool
+	Timestamp  time.Time
 }
 
 //helper methods for Employee
-func (e *Employee) PrintName() {
-
-	log.Println(e.Name)
-}
 
 func (e *Employee) GetID() int {
 
@@ -126,21 +127,25 @@ func InitializeEmployeesAndMaps() {
 }
 func StoreEmployeesByIdDeptAndLoc(moreEmployees *([]Employee)) {
 
-	storeIDs(moreEmployees)
+	wg.Add(4)
+	go storeIDs(moreEmployees)
 	//stores ids as keys and employees as values
-	storeEmployeesByIDMap(moreEmployees)
+
+	go storeEmployeesByIDMap(moreEmployees)
 
 	//stores department names (strings) as keys and reference to array of employees as values
-	storeEmployeesByDeptMap(moreEmployees)
+	go storeEmployeesByDeptMap(moreEmployees)
 
 	//stores PIN codes (int) as keys and reference to array of employees as values
 
-	storeEmployeesByLocMap(moreEmployees)
+	go storeEmployeesByLocMap(moreEmployees)
 
+	wg.Wait()
 }
 
 func storeIDs(moreEmployees *([]Employee)) {
 
+	defer wg.Done()
 	for _, empl := range *moreEmployees {
 
 		IDset[empl.GetID()] = true
@@ -154,7 +159,7 @@ func storeIDs(moreEmployees *([]Employee)) {
 }
 
 func storeEmployeesByDeptMap(moreEmployees *([]Employee)) {
-
+	defer wg.Done()
 	for _, empl := range *moreEmployees {
 
 		deptList := empl.GetDept()
@@ -184,7 +189,7 @@ func storeEmployeesByDeptMap(moreEmployees *([]Employee)) {
 }
 
 func storeEmployeesByIDMap(moreEmployees *([]Employee)) {
-
+	defer wg.Done()
 	for _, empl := range *moreEmployees {
 
 		IdEmpMap[empl.GetID()] = empl
@@ -194,7 +199,7 @@ func storeEmployeesByIDMap(moreEmployees *([]Employee)) {
 }
 
 func storeEmployeesByLocMap(moreEmployees *([]Employee)) {
-
+	defer wg.Done()
 	for _, empl := range *moreEmployees {
 
 		pins := empl.GetPins()

@@ -10,155 +10,63 @@ var testEmployee1 store.Employee
 var testEmployee2 store.Employee
 var testEmployee3 store.Employee
 
-func TestDeleteFullEmployeeList(t *testing.T) {
+func TestDeleteFromEverywhere(t *testing.T) {
 
 	initializeStuff()
-	if len(testEmployees) == 0 {
 
-		t.Error("Problem in initializing delete tests.")
+	err := DeleteFromEverywhere()
+
+	if err != nil {
+
+		t.Error("Expected all employees to be deleted, got", err)
+
 	}
-	DeleteFullEmployeeList(&testEmployees)
-
-	if len(testEmployees) != 0 {
-
-		t.Error("Expected all employees to be deleted but found", len(testEmployees), "left")
-	}
-
-}
-
-func BenchmarkDeleteFullEmployeeList(b *testing.B) {
-
-	initializeStuff()
-	b.ResetTimer()
-
-	DeleteFullEmployeeList(&testEmployees)
-
-}
-
-func TestDeleteFullIDempMap(t *testing.T) {
-
-	initializeStuff()
-	if len(testEmployees) == 0 {
-
-		t.Error("Problem in initializing delete tests.")
-	}
-
-	DeleteFullIDempMap(&(store.IdEmpMap))
 
 	if len(store.IdEmpMap) != 0 {
 
-		t.Error("Expected all employees to be deleted but found", len(store.IdEmpMap), "left")
+		t.Error("Expected length of IdEmpMap to be 0 after deletion, got", len(store.IdEmpMap))
 	}
-
-}
-
-func BenchmarkDeleteFullIDempMap(b *testing.B) {
-
-	initializeStuff()
-	b.ResetTimer()
-
-	DeleteFullIDempMap(&(store.IdEmpMap))
-}
-
-func TestDeleteFullDeptEmpMap(t *testing.T) {
-
-	initializeStuff()
-	if len(testEmployees) == 0 {
-
-		t.Error("Problem in initializing delete tests.")
-	}
-
-	DeleteFullDeptEmpMap(&(store.DeptEmpMap))
 
 	if len(store.DeptEmpMap) != 0 {
 
-		t.Error("Expected all employees to be deleted but found", len(store.DeptEmpMap), "left")
+		t.Error("Expected length of DeptEmpMap to be 0 after deletion, got", len(store.DeptEmpMap))
 	}
-
-}
-
-func BenchmarkDeleteFullDeptempMap(b *testing.B) {
-
-	initializeStuff()
-	b.ResetTimer()
-
-	DeleteFullDeptEmpMap(&(store.DeptEmpMap))
-
-}
-
-func TestDeleteFullLocEmpMap(t *testing.T) {
-
-	initializeStuff()
-	if len(testEmployees) == 0 {
-
-		t.Error("Problem in initializing delete tests.")
-	}
-
-	DeleteFullLocEmpMap(&(store.LocEmpMap))
 
 	if len(store.LocEmpMap) != 0 {
 
-		t.Error("Expected all employees to be deleted but found", len(store.LocEmpMap), "left")
+		t.Error("Expected length of LocEmpMap to be 0 after deletion, got", len(store.LocEmpMap))
 	}
 
 }
 
-func BenchmarkDeleteFullLocempMap(b *testing.B) {
+func BenchmarkDeleteFromEverywhere(b *testing.B) {
 
 	initializeStuff()
 	b.ResetTimer()
 
-	DeleteFullLocEmpMap(&(store.LocEmpMap))
+	DeleteFromEverywhere()
 
 }
 
-func TestDeleteEmployeeByIDFromList(t *testing.T) {
+func TestDeleteByIDFromEverywhere(t *testing.T) {
 
 	initializeStuff()
 
-	if len(testEmployees) != 3 {
-		t.Error("Problem with initializing stuff for DeleteEmployeeByIDFromlist")
+	err := DeleteByIDFromEverywhere(1)
+
+	if err != nil {
+
+		t.Error("Expected employee with ID 1 to be deleted, got", err)
+
 	}
 
-	if (testEmployees[0]).Name != "Pappu" {
-		t.Error("Problem with initializing stuff for DeleteEmployeeByIDFromlist")
+	if len(store.Employees) != 2 {
+		t.Error("Expected size of Employees list to be 2 after 1 deletion got", len(store.Employees))
 	}
 
-	DeleteEmployeeByIDFromList(1, &testEmployees)
-
-	if len(testEmployees) != 2 {
-		t.Error("Expected size of testEmployees to be 2 after 1 deletion got", len(testEmployees))
+	if (store.Employees[0]).Name == "Pappu" {
+		t.Error("Expected Pappu to be deleted got", (store.Employees[0]).Name)
 	}
-
-	if (testEmployees[0]).Name == "Pappu" {
-		t.Error("Expected Pappu to be deleted got", (testEmployees[0]).Name)
-	}
-
-}
-
-func BenchmarkEmployeeByIDFromList(b *testing.B) {
-
-	initializeStuff()
-	b.ResetTimer()
-
-	for i := 0; i < 3; i++ {
-		DeleteEmployeeByIDFromList(i+1, &testEmployees)
-	}
-}
-
-func TestDeleteEmployeeByIDFromDeptMap(t *testing.T) {
-
-	initializeStuff()
-
-	if len(testEmployees) != 3 {
-		t.Error("Problem with initializing stuff for DeleteEmployeeByIDFromlist")
-	}
-
-	if (testEmployees[0]).Name != "Pappu" {
-		t.Error("Problem with initializing stuff for DeleteEmployeeByIDFromlist")
-	}
-
-	DeleteEmployeeByIDFromDeptMap(1, testEmployees[0].GetDept(), &(store.DeptEmpMap))
 
 	for _, empl := range *(store.DeptEmpMap["Accounts"]) {
 
@@ -180,32 +88,6 @@ func TestDeleteEmployeeByIDFromDeptMap(t *testing.T) {
 
 	}
 
-}
-
-func BenchmarkDeleteEmployeeIDFromDeptMap(b *testing.B) {
-
-	initializeStuff()
-	b.ResetTimer()
-
-	for i := 0; i < 3; i++ {
-		DeleteEmployeeByIDFromDeptMap(i+1, testEmployees[i].GetDept(), &(store.DeptEmpMap))
-	}
-}
-
-func TestDeleteEmployeeByIDFromLocMap(t *testing.T) {
-
-	initializeStuff()
-
-	if len(testEmployees) != 3 {
-		t.Error("Problem with initializing stuff for DeleteEmployeeByIDFromlist")
-	}
-
-	if (testEmployees[0]).Name != "Pappu" {
-		t.Error("Problem with initializing stuff for DeleteEmployeeByIDFromlist")
-	}
-
-	DeleteEmployeeByIDFromLocMap(1, testEmployees[0].GetPins(), &(store.LocEmpMap))
-
 	for _, empl := range *(store.LocEmpMap[560002]) {
 
 		if empl.GetID() == 1 {
@@ -226,32 +108,6 @@ func TestDeleteEmployeeByIDFromLocMap(t *testing.T) {
 
 	}
 
-}
-
-func BenchmarkDeleteEmployeeIDFromLocMap(b *testing.B) {
-
-	initializeStuff()
-	b.ResetTimer()
-
-	for i := 0; i < 3; i++ {
-		DeleteEmployeeByIDFromLocMap(i+1, testEmployees[i].GetPins(), &(store.LocEmpMap))
-	}
-}
-
-func TestDeleteEmployeeByIDFromIDMap(t *testing.T) {
-
-	initializeStuff()
-
-	if len(testEmployees) != 3 {
-		t.Error("Problem with initializing stuff for DeleteEmployeeByIDFromlist")
-	}
-
-	if (testEmployees[0]).Name != "Pappu" {
-		t.Error("Problem with initializing stuff for DeleteEmployeeByIDFromlist")
-	}
-
-	DeleteEmployeeByIDFromIdMap(1, &(store.IdEmpMap))
-
 	if (store.IdEmpMap[1]).Name == "Pappu" {
 
 		t.Error("Expected Pappu to be deleted from ID Emp map but found", (store.IdEmpMap[1]).Name)
@@ -259,13 +115,13 @@ func TestDeleteEmployeeByIDFromIDMap(t *testing.T) {
 
 }
 
-func BenchmarkDeleteEmployeeByIDFromIdMap(b *testing.B) {
+func BenchmarkDeleteByIDFromEverywhere(b *testing.B) {
 
 	initializeStuff()
 	b.ResetTimer()
 
 	for i := 0; i < 3; i++ {
-		DeleteEmployeeByIDFromIdMap(i+1, &(store.IdEmpMap))
+		DeleteByIDFromEverywhere(i + 1)
 	}
 }
 
@@ -316,6 +172,7 @@ func initializeStuff() {
 	testEmployees = []store.Employee{
 		testEmployee1, testEmployee2, testEmployee3}
 	store.InitializeEmployeesAndMaps()
+	store.Employees = append(store.Employees, testEmployees...)
 	store.StoreEmployeesByIdDeptAndLoc(&testEmployees)
 
 }

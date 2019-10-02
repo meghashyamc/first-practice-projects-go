@@ -43,10 +43,10 @@ func TestAreCompulsoryFieldsThere(t *testing.T) {
 
 	initializeStuff()
 
-	fieldsThere := areCompulsoryFieldsThere(&testEmployees)
+	err := areCompulsoryFieldsThere(&testEmployees)
 
-	if fieldsThere == true {
-		t.Error("Expected compulsory fields to not be there, got", true)
+	if err == nil {
+		t.Error("Expected compulsory fields to not be there, got error:", nil)
 	}
 
 }
