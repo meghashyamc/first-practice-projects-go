@@ -1,5 +1,7 @@
 <b>Practice project that helps store data in and retrieve data from IPFS.</b>
 
+NOTE: As I look back at this (an year later), I see that the naming conventions I've used are definitely not great. 'lepyaPract' itself doesn't make much sense. 
+
 Supports these commands:
 
 <b>/add</b> (Enter arg as key and upload file) 
