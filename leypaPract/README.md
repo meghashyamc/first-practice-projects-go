@@ -1,8 +1,8 @@
-<b>Practice project that helps store data in a decentralized way.</b>
+<b>Practice project that helps store data in and retrieve data from IPFS.</b>
 
 Supports these commands:
 
-<b>/add</b> (In Postman, enter arg as key and upload file) 
+<b>/add</b> (Enter arg as key and upload file) 
 
 <b>/cat</b> (Enter arg as key and hash of the file as value)
 
